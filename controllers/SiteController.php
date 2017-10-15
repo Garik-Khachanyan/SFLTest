@@ -55,6 +55,21 @@ class SiteController extends Controller
     }
 
     /**
+     * @param \yii\base\Action $action
+     * @return bool
+     */
+    public function beforeAction($action)
+    {
+        $userId = Yii::$app->session->get('userId');
+        if(!isset($userId) && $action->id != 'login')
+        {
+            $this->redirect(array('/login'));
+        }
+
+        return true;
+    }
+
+    /**
      * Displays homepage.
      *
      * @return string
@@ -91,9 +106,11 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        Yii::$app->user->logout();
+        $session = Yii::$app->session;
+        $session->destroy();
+        $this->redirect(array('/login'));
+        return true;
 
-        return $this->goHome();
     }
 
     /**

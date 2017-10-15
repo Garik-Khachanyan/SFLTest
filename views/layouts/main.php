@@ -18,6 +18,7 @@ AppAsset::register($this);
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
@@ -26,36 +27,35 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
 
 <div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => 'My Company',
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
-    ]);
-    NavBar::end();
-    ?>
+    <nav id="w0" class="navbar-inverse navbar-fixed-top navbar"><div class="container">
+            <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w0-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    </button>
+                <a class="navbar-brand" href="/">My Company</a>
+            </div>
+            <div id="w0-collapse" class="collapse navbar-collapse">
+                <?php if(Yii::$app->session->get('userType') == 'manager'){ ?>
+
+                    <ul id="w1" class="navbar-nav navbar-right nav">
+                    <li class="<?=$_SERVER['REQUEST_URI'] == '/manager' ? 'active':'' ?>"><a  href="/manager">Tables</a></li>
+                    <li class="<?=$_SERVER['REQUEST_URI'] == '/manager/products' ? 'active':'' ?>"><a href="/manager/products">Products</a></li>
+                    <li class="<?=$_SERVER['REQUEST_URI'] == '/manager/users' ? 'active':'' ?>"><a href="/manager/users">Users</a></li>
+                    <li><a href="/site/logout">Logout</a></li>
+                </ul>
+               <?php }elseif(Yii::$app->session->get('userType') == 'waiter'){ ?>
+                    <ul id="w1" class="navbar-nav navbar-right nav">
+                        <li class="<?=$_SERVER['REQUEST_URI'] == '/manager' ? 'active':'' ?>"><a href="/waiter">My Tables</a></li>
+                        <li class="<?=$_SERVER['REQUEST_URI'] == '/manager' ? 'active':'' ?>"><a href="/site/logout">Logout</a></li>
+                    </ul>
+                <?php } ?>
+
+            </div>
+          </div>
+    </nav>
 
     <div class="container">
         <?= Breadcrumbs::widget([
@@ -76,4 +76,6 @@ AppAsset::register($this);
 <?php $this->endBody() ?>
 </body>
 </html>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 <?php $this->endPage() ?>

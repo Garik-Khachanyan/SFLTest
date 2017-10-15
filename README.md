@@ -1,12 +1,28 @@
-Yii 2 Basic Project Template
+SFL TEST Project Based on Yii 2
 ============================
+
+IMPORTANT FOR PROJECT SETUP
+---------------------------
+After clone , run composer update, composer Installation described bellow:
+Name Your MYSQL DB sfl_test:
+Create virtual server root from project/web folder:
+At folder directory run CMD command
+~~~
+yii migrate
+~~~
+To make Migrations
+
+USERNAME FOR MANAGER: TestManager
+PASSWORD:123456,
+
+Thanks for attention :)
+============================
+
 
 Yii 2 Basic Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
 rapidly creating small projects.
 
-The template contains the basic features including user login/logout and a contact page.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
+
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-app-basic/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-app-basic)
 [![Total Downloads](https://poser.pugx.org/yiisoft/yii2-app-basic/downloads.png)](https://packagist.org/packages/yiisoft/yii2-app-basic)
@@ -89,7 +105,7 @@ Edit the file `config/db.php` with real data, for example:
 ```php
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
+    'dsn' => 'mysql:host=localhost;dbname=sfl_test',
     'username' => 'root',
     'password' => '1234',
     'charset' => 'utf8',

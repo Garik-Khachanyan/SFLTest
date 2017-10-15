@@ -2,103 +2,109 @@
 
 namespace app\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
+use Yii;
+use yii\db\ActiveRecord;
+
+class User extends ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return 'users';
     }
-
     /**
-     * @inheritdoc
+     * Get User with given email and Password
+     * For Login functionality
+     * @param $userData
+     * @return array|bool|false
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function loginUser($userData)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
+        $bind = [
+            ':userName' => $userData['userName'],
+            ':password' => md5($userData['password'])
+        ];
+        $user = Yii::$app->db->createCommand('SELECT * FROM users WHERE userName=:userName AND password=:password')
+            ->bindValues($bind)
+            ->queryOne();
+        if(empty($user)){
+            return false;
         }
+        return $user;
 
-        return null;
     }
 
     /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
+     * Get assigned tables for user
+     * @param $userId
+     * @return array
      */
-    public static function findByUsername($username)
+    public static function getUserTablesByUserId($userId)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
+        $bind = [
+            ':userId' => $userId,
+        ];
+        $user = Yii::$app->db->createCommand("SELECT
+                                                cafe_tables.tableId as tableId,
+                                                cafe_tables.description as tableDescription,
+                                                cafe_tables.seats as seats,
+                                                orders.orderId as orderId
+                                                FROM
+                                                cafe_tables
+                                                LEFT JOIN orders ON (orders.tableId = cafe_tables.tableId AND orders.status = 'pending')
+                                                INNER JOIN users
+                                                ON (cafe_tables.waiterId = users.userId)
+                                                WHERE  users.userId =:userId")
+            ->bindValues($bind)
+            ->queryAll();
 
-        return null;
+        return $user;
     }
 
     /**
-     * @inheritdoc
+     * get userData with given userId
+     * @param $userId
+     * @return array|false
      */
-    public function getId()
+    public static function getUserById($userId)
     {
-        return $this->id;
+        $bind = [
+            ':userId' => $userId,
+        ];
+        $user = Yii::$app->db->createCommand("SELECT
+                                                IFNULL(count(cafe_tables.tableId),0) as assignedTables,
+                                                users.userName,
+                                                users.userId
+                                                FROM
+                                                users
+                                                LEFT JOIN cafe_tables
+                                                ON (cafe_tables.waiterId = users.userId)
+                                                WHERE users.userType = 'waiter'
+                                                AND users.userId =:userId
+                                                GROUP BY users.userId")
+            ->bindValues($bind)
+            ->queryOne();
+
+        return $user;
+
     }
 
     /**
-     * @inheritdoc
+     * GET User List with their assigned tables count
+     * @return array
      */
-    public function getAuthKey()
+    public static function getAllUsersWithTables()
     {
-        return $this->authKey;
+        $users = Yii::$app->db->createCommand("SELECT
+                                                IFNULL(count(cafe_tables.tableId),0) as assignedTables,
+                                                users.userName,
+                                                users.userId
+                                                FROM users
+                                                LEFT JOIN cafe_tables
+                                                ON (cafe_tables.waiterId = users.userId)
+                                                WHERE users.userType = 'waiter'
+                                                GROUP BY users.userId")
+                ->queryAll();
+        return $users;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
-    }
 }
