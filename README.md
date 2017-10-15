@@ -4,8 +4,11 @@ SFL TEST Project Based on Yii 2
 IMPORTANT FOR PROJECT SETUP
 ---------------------------
 After clone , run composer update, composer Installation described bellow:
+
 Name Your MYSQL DB sfl_test:
+
 Create virtual server root from project/web folder:
+
 At folder directory run CMD command
 ~~~
 yii migrate
