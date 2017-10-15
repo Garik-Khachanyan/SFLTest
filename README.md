@@ -16,6 +16,7 @@ yii migrate
 To make Migrations
 
 USERNAME FOR MANAGER: TestManager
+
 PASSWORD:123456,
 
 Thanks for attention :)
